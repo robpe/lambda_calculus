@@ -27,6 +27,8 @@ class LCI
     @env = {}
     @lang = {
       Numeric => lambda { |e| e },
+      :true   => lambda { |e| true },
+      :false  => lambda { |e| false },
       :+      => lambda { |e| e.shift
         Plus.new(parse(e.first), parse(e.last))
       },
@@ -43,12 +45,12 @@ class LCI
         Call.new(parse(e.first), parse(e.last))
       },
       :if     => lambda { |e| e.shift
-        If.new(e.shift, parse(e.first), parse(e.first))
+        If.new(parse(e.shift), parse(e.first), parse(e.last))
       },
       :let    => lambda { |e| e.shift
         LetDirect.new(e.shift, parse(e.first), parse(e.last))
       },
-      :letf    => lambda { |e| e.shift
+      :letf   => lambda { |e| e.shift
         LetByFunc.new(e.shift, parse(e.first), parse(e.last))
       }
     }
@@ -123,6 +125,7 @@ class LCI
   end
 
   def parse(expr)
+    p expr
     # if s-expr
     if expr.is_a? Array
       @lang[expr.first].call(expr)
